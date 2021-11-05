@@ -1,0 +1,15 @@
+/vendor
+/.idea
+/build
+.netrc
+.vscode
+.vs
+.tern-project
+.DS_Store
+.idea
+.idea/*
+.cgo_ldflags# Created by .ignore support plugin (hsz.mobi)
+.*.swp
+dist/*
+
+dist/
