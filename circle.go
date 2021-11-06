@@ -36,24 +36,6 @@ func (e Error) Error() string {
 	return string(e)
 }
 
-// Query is processing parameters.
-type Query struct {
-	URL     string
-	Page    int
-	Version string
-}
-
-type UserInfo struct {
-	ID         int    `json:"id,omitempty"`
-	Mobile     string `json:"mobile,omitempty"`
-	Token      string `json:"token,omitempty"`
-	UserID     int    `json:"user_id,omitempty"`
-	Createtime int    `json:"createtime,omitempty"`
-	Expiretime int    `json:"expiretime,omitempty"`
-	ExpiresIn  int    `json:"expires_in,omitempty"`
-	Lastname   string `json:"lastname,omitempty"`
-}
-
 type UserSource struct {
 	URL                string
 	Account            string
@@ -65,7 +47,7 @@ type UserSource struct {
 // User is an interface for login.
 type User interface {
 	Connect(ctx context.Context, src *UserSource) error
-	Login(ctx context.Context, src *UserSource) (*UserInfo, error)
+	Login(ctx context.Context, u UserSource) (Response, error)
 }
 
 type Response interface {
@@ -95,6 +77,12 @@ type Task struct {
 
 type Tasks []Task
 
+// Query is processing parameters.
+type Query struct {
+	Page    int
+	Version string
+}
+
 // Fetcher is an interface for fetch task list.
 type Fetcher interface {
 	Fetch(ctx context.Context, query Query) (Tasks, error)
@@ -111,3 +99,17 @@ type Tasker interface {
 	Share
 	SharedByOtherRead(ctx context.Context) error
 }
+
+/*
+	type UserInfo struct {
+	ID         int    `json:"id,omitempty"`
+	Mobile     string `json:"mobile,omitempty"`
+	Token      string `json:"token,omitempty"`
+	UserID     int    `json:"user_id,omitempty"`
+	Createtime int    `json:"createtime,omitempty"`
+	Expiretime int    `json:"expiretime,omitempty"`
+	ExpiresIn  int    `json:"expires_in,omitempty"`
+	Lastname   string `json:"lastname,omitempty"`
+}
+
+*/

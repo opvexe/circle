@@ -28,6 +28,11 @@ import (
 	"x6t.io/circle"
 )
 
+var _ circle.User = &Client{}
+var _ circle.Fetcher = &Client{}
+var _ circle.Share = &Client{}
+
+// Shared transports for all clients to prevent leaking connections
 var skipVerifyTransport *http.Transport
 var defaultTransport *http.Transport
 
