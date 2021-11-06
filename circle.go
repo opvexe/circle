@@ -111,8 +111,14 @@ type Share interface {
 	Wechat(ctx context.Context, share WechatShare) error
 }
 
+type Read interface {
+	SharedByOtherRead(ctx context.Context) error
+}
+
 // Tasker is an interface for dispose task.
 type Tasker interface {
-	Share
-	SharedByOtherRead(ctx context.Context) error
+	// StatisticsTask 统计任务
+	StatisticsTask(ctx context.Context) (Tasks,error)
+	// ProcessTask 处理任务
+	ProcessTask(ctx context.Context) error
 }

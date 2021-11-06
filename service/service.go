@@ -29,6 +29,7 @@ const (
 	tasks  = "mytask/wwtask"       // 任务列表
 	detail = "mytask/microdetail"  // 任务详情
 	wechat = "mytask/forwardlogww" // 1:朋友圈 2:微信群
+	Link   = ""                    // 分享链接地址
 )
 
 type UserService struct{}
