@@ -18,13 +18,6 @@ package circle
 
 import "context"
 
-const URL = "https://informationworld.zdjt.com/index.php/api/"
-
-const (
-	login = "/user/login"
-	tasks = "/mytask/wwtask"
-)
-
 const (
 	ErrUpstreamTimeout = Error("request to backend timed out")
 )
@@ -44,10 +37,21 @@ type Source struct {
 	InsecureSkipVerify bool
 }
 
+type UserInfo struct {
+	ID         int    `json:"id,omitempty"`
+	Mobile     string `json:"mobile,omitempty"`
+	Token      string `json:"token,omitempty"`
+	UserID     int    `json:"user_id,omitempty"`
+	Createtime int    `json:"createtime,omitempty"`
+	Expiretime int    `json:"expiretime,omitempty"`
+	ExpiresIn  int    `json:"expires_in,omitempty"`
+	Lastname   string `json:"lastname,omitempty"`
+}
+
 // User is an interface for login.
 type User interface {
 	Connect(ctx context.Context, src *Source) error
-	Login(ctx context.Context, u Source) (Response, error)
+	Login(ctx context.Context, u Source) (*UserInfo, error)
 }
 
 type Response interface {
@@ -99,17 +103,3 @@ type Tasker interface {
 	Share
 	SharedByOtherRead(ctx context.Context) error
 }
-
-/*
-	type UserInfo struct {
-	ID         int    `json:"id,omitempty"`
-	Mobile     string `json:"mobile,omitempty"`
-	Token      string `json:"token,omitempty"`
-	UserID     int    `json:"user_id,omitempty"`
-	Createtime int    `json:"createtime,omitempty"`
-	Expiretime int    `json:"expiretime,omitempty"`
-	ExpiresIn  int    `json:"expires_in,omitempty"`
-	Lastname   string `json:"lastname,omitempty"`
-}
-
-*/

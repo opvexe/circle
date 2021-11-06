@@ -102,9 +102,13 @@ type result struct {
 	Err      error
 }
 
-func (c *Client) Login(ctx context.Context, u circle.Source) (circle.Response, error)   {
-	res,err := c.login(ctx,u)
-	if err!=nil{
+type showUserinfo struct {
+	UserInfo  circle.UserInfo `json:"userinfo"`
+}
+
+func (c *Client) Login(ctx context.Context, u circle.Source) (*circle.UserInfo, error) {
+	res, err := c.login(ctx, u)
+	if err != nil {
 		return nil, err
 	}
 
@@ -113,10 +117,12 @@ func (c *Client) Login(ctx context.Context, u circle.Source) (circle.Response, e
 		return nil, err
 	}
 
-	fmt.Println(octets)
-	return nil,nil
+	results := showUserinfo{}
+	if err := json.Unmarshal(octets, &results); err != nil {
+		return nil, err
+	}
+	return &results.UserInfo, nil
 }
-
 
 func (c *Client) login(ctx context.Context, u circle.Source) (circle.Response, error) {
 	resps := make(chan result)
@@ -134,9 +140,9 @@ func (c *Client) login(ctx context.Context, u circle.Source) (circle.Response, e
 }
 
 type responseType struct {
-	Results json.RawMessage
-	Err     int    `json:"code,omitempty"` // code status
-	V2Err   string `json:"msg,omitempty"`  // error message
+	Results json.RawMessage `json:"data,omitempty"`
+	Err     int             `json:"code,omitempty"` // code status
+	V2Err   string          `json:"msg,omitempty"`  // error message
 }
 
 // MarshalJSON returns the raw results bytes from the response
@@ -170,11 +176,11 @@ func (c *Client) Get(u *url.URL, q circle.Source) (circle.Response, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	defer resp.Body.Close()
 
 	var response responseType
-	dec := json.NewDecoder(resp.Body)
-	decErr := dec.Decode(&response)
+	decErr := json.NewDecoder(resp.Body).Decode(&response)
 
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, response.Error())
