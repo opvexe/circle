@@ -18,13 +18,58 @@ package circle
 
 import "context"
 
-const URL = "https://informationworld.zdjt.com/index.php/api/mytask/"
+const URL = "https://informationworld.zdjt.com/index.php/api/"
+
+const (
+	login = "/user/login"
+	tasks = "/mytask/wwtask"
+)
+
+const (
+	ErrUpstreamTimeout = Error("request to backend timed out")
+)
+
+// Error is a domain error encountered while processing circle requests
+type Error string
+
+func (e Error) Error() string {
+	return string(e)
+}
 
 // Query is processing parameters.
 type Query struct {
 	URL     string
 	Page    int
 	Version string
+}
+
+type UserInfo struct {
+	ID         int    `json:"id,omitempty"`
+	Mobile     string `json:"mobile,omitempty"`
+	Token      string `json:"token,omitempty"`
+	UserID     int    `json:"user_id,omitempty"`
+	Createtime int    `json:"createtime,omitempty"`
+	Expiretime int    `json:"expiretime,omitempty"`
+	ExpiresIn  int    `json:"expires_in,omitempty"`
+	Lastname   string `json:"lastname,omitempty"`
+}
+
+type UserSource struct {
+	URL                string
+	Account            string
+	Password           string
+	Tuisongclientid    string
+	InsecureSkipVerify bool
+}
+
+// User is an interface for login.
+type User interface {
+	Connect(ctx context.Context, src *UserSource) error
+	Login(ctx context.Context, src *UserSource) (*UserInfo, error)
+}
+
+type Response interface {
+	MarshalJSON() ([]byte, error)
 }
 
 type Task struct {
@@ -50,11 +95,6 @@ type Task struct {
 
 type Tasks []Task
 
-// User is an interface for login.
-type User interface {
-	Login(ctx context.Context, username, password string) (string, error)
-}
-
 // Fetcher is an interface for fetch task list.
 type Fetcher interface {
 	Fetch(ctx context.Context, query Query) (Tasks, error)
@@ -70,10 +110,4 @@ type Share interface {
 type Tasker interface {
 	Share
 	SharedByOtherRead(ctx context.Context) error
-}
-
-// Client is an interface for handle http request.
-type Client interface {
-	Get(ctx context.Context) error
-	Post(ctx context.Context) error
 }
