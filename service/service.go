@@ -25,10 +25,10 @@ import (
 const URL = "https://informationworld.zdjt.com/index.php/api/"
 
 const (
-	login   = "user/login"          // 登陆
-	tasks   = "mytask/wwtask"       // 任务列表
-	detail  = "mytask/microdetail"  // 任务详情
-	friends = "mytask/forwardlogww" // 朋友圈
+	login  = "user/login"          // 登陆
+	tasks  = "mytask/wwtask"       // 任务列表
+	detail = "mytask/microdetail"  // 任务详情
+	wechat = "mytask/forwardlogww" // 1:朋友圈 2:微信群
 )
 
 type UserService struct{}
@@ -53,7 +53,7 @@ func (s *FetchService) New(src circle.Source) (circle.Fetcher, error) {
 	return client, nil
 }
 
-type ShareService struct {}
+type ShareService struct{}
 
 func (s *ShareService) New(src circle.Source) (circle.Share, error) {
 	client := &queries.Client{}

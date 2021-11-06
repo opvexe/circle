@@ -158,7 +158,7 @@ func TestUserService_New_Task_Share_Friend(t *testing.T) {
 			name: "service-detail",
 			args: args{
 				src: circle.Source{
-					URL:   fmt.Sprintf("%s%s", URL, friends),
+					URL:   fmt.Sprintf("%s%s", URL, wechat),
 					Token: "eb470e70-14dc-4c8b-8e89-60d3e7aba278",
 				},
 			},
@@ -173,7 +173,7 @@ func TestUserService_New_Task_Share_Friend(t *testing.T) {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			err = got.WechatFriends(context.TODO(), circle.WechatShare{
+			err = got.Wechat(context.TODO(), circle.WechatShare{
 				Microgrid: "840",
 				Type:      "1",
 			})

@@ -25,15 +25,15 @@ import (
 	"x6t.io/circle"
 )
 
-func (c *Client) WechatFriends(ctx context.Context, share circle.WechatShare) error {
-	_, err := c.wechatFriends(ctx, share)
+func (c *Client) Wechat(ctx context.Context, share circle.WechatShare) error {
+	_, err := c.wechat(ctx, share)
 	return err
 }
 
-func (c *Client) wechatFriends(ctx context.Context, u circle.WechatShare) (circle.Response, error) {
+func (c *Client) wechat(ctx context.Context, u circle.WechatShare) (circle.Response, error) {
 	resps := make(chan result)
 	go func() {
-		resp, err := c.getWechatFriends(c.URL, u)
+		resp, err := c.getWechat(c.URL, u)
 		resps <- result{resp, err}
 	}()
 
@@ -45,7 +45,7 @@ func (c *Client) wechatFriends(ctx context.Context, u circle.WechatShare) (circl
 	}
 }
 
-func (c *Client) getWechatFriends(u *url.URL, q circle.WechatShare) (circle.Response, error) {
+func (c *Client) getWechat(u *url.URL, q circle.WechatShare) (circle.Response, error) {
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -92,8 +92,4 @@ func (c *Client) getWechatFriends(u *url.URL, q circle.WechatShare) (circle.Resp
 	}
 
 	return &response, nil
-}
-
-func (c *Client) WechatGroup(ctx context.Context, share circle.WechatShare) error {
-	return nil
 }

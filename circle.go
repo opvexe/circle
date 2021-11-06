@@ -99,10 +99,16 @@ type WechatShare struct {
 	Type      string
 }
 
+type WechatType string
+
+const (
+	Friends = "1" // 朋友圈
+	Group   = "2" // 微信群
+)
+
 // Share is an interface for share articles to wechat groups and friends.
 type Share interface {
-	WechatFriends(ctx context.Context, share WechatShare) error
-	WechatGroup(ctx context.Context, share WechatShare) error
+	Wechat(ctx context.Context, share WechatShare) error
 }
 
 // Tasker is an interface for dispose task.
