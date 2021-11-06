@@ -78,7 +78,7 @@ func TestUserService_New_Task_List(t *testing.T) {
 			name: "service-fetch",
 			args: args{
 				src: circle.Source{
-					URL: fmt.Sprintf("%s%s", URL, tasks),
+					URL:   fmt.Sprintf("%s%s", URL, tasks),
 					Token: "eb470e70-14dc-4c8b-8e89-60d3e7aba278",
 				},
 			},
@@ -93,7 +93,7 @@ func TestUserService_New_Task_List(t *testing.T) {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			resp, err := got.Fetch(context.TODO(),circle.Fitter{Page: "1",Version: "1.0.4"})
+			resp, err := got.Fetch(context.TODO(), circle.Fitter{Page: "1", Version: "1.0.4"})
 			if err != nil {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -115,10 +115,10 @@ func TestUserService_New_Task_Detail(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "service-fetch",
+			name: "service-detail",
 			args: args{
 				src: circle.Source{
-					URL: fmt.Sprintf("%s%s", URL, detail),
+					URL:   fmt.Sprintf("%s%s", URL, detail),
 					Token: "eb470e70-14dc-4c8b-8e89-60d3e7aba278",
 				},
 			},
@@ -133,13 +133,53 @@ func TestUserService_New_Task_Detail(t *testing.T) {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			resp, err := got.Detail(context.TODO(),"840")
+			resp, err := got.Detail(context.TODO(), "840")
 			if err != nil {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if resp == nil {
 				t.Errorf("New() got = %v", got)
+			}
+		})
+	}
+}
+
+func TestUserService_New_Task_Share_Friend(t *testing.T) {
+	type args struct {
+		src circle.Source
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "service-detail",
+			args: args{
+				src: circle.Source{
+					URL:   fmt.Sprintf("%s%s", URL, friends),
+					Token: "eb470e70-14dc-4c8b-8e89-60d3e7aba278",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &ShareService{}
+			got, err := s.New(tt.args.src)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			err = got.WechatFriends(context.TODO(), circle.WechatShare{
+				Microgrid: "840",
+				Type:      "1",
+			})
+			if err != nil {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}

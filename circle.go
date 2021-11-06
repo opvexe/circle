@@ -91,13 +91,18 @@ type Fitter struct {
 // Fetcher is an interface for fetch task list.
 type Fetcher interface {
 	Fetch(ctx context.Context, query Fitter) (Tasks, error)
-	Detail(ctx context.Context, microgrid string) (*Task,error)
+	Detail(ctx context.Context, microgrid string) (*Task, error)
+}
+
+type WechatShare struct {
+	Microgrid string
+	Type      string
 }
 
 // Share is an interface for share articles to wechat groups and friends.
 type Share interface {
-	WechatFriends(ctx context.Context, tasks Tasks) error
-	WechatGroup(ctx context.Context, tasks Tasks) error
+	WechatFriends(ctx context.Context, share WechatShare) error
+	WechatGroup(ctx context.Context, share WechatShare) error
 }
 
 // Tasker is an interface for dispose task.

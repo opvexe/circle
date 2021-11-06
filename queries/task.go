@@ -111,7 +111,7 @@ func (c *Client) getFetchTasks(u *url.URL, q circle.Fitter) (circle.Response, er
 	return &response, nil
 }
 
-func (c *Client) Detail(ctx context.Context, microgrid string) (*circle.Task,error)  {
+func (c *Client) Detail(ctx context.Context, microgrid string) (*circle.Task, error) {
 	res, err := c.detail(ctx, microgrid)
 	if err != nil {
 		return nil, err
@@ -129,7 +129,7 @@ func (c *Client) Detail(ctx context.Context, microgrid string) (*circle.Task,err
 	return &results, nil
 }
 
-func (c *Client) detail(ctx context.Context,m string) (circle.Response, error) {
+func (c *Client) detail(ctx context.Context, m string) (circle.Response, error) {
 	resps := make(chan result)
 	go func() {
 		resp, err := c.getFetchDetail(c.URL, m)

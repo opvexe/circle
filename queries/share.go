@@ -18,13 +18,82 @@ package queries
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
 	"x6t.io/circle"
 )
 
-func (c *Client) WechatFriends(ctx context.Context, tasks circle.Tasks) error {
-	return nil
+func (c *Client) WechatFriends(ctx context.Context, share circle.WechatShare) error {
+	_, err := c.wechatFriends(ctx, share)
+	return err
 }
 
-func (c *Client) WechatGroup(ctx context.Context, tasks circle.Tasks) error {
+func (c *Client) wechatFriends(ctx context.Context, u circle.WechatShare) (circle.Response, error) {
+	resps := make(chan result)
+	go func() {
+		resp, err := c.getWechatFriends(c.URL, u)
+		resps <- result{resp, err}
+	}()
+
+	select {
+	case resp := <-resps:
+		return resp.Response, resp.Err
+	case <-ctx.Done():
+		return nil, circle.ErrUpstreamTimeout
+	}
+}
+
+func (c *Client) getWechatFriends(u *url.URL, q circle.WechatShare) (circle.Response, error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.Token == "" {
+		return nil, fmt.Errorf("token must be empty")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("token", c.Token)
+
+	params := req.URL.Query()
+	params.Set("microid", q.Microgrid)
+	params.Set("type", q.Type) // default 1
+
+	req.URL.RawQuery = params.Encode()
+	hc := &http.Client{}
+	hc.Transport = SharedTransport(c.InsecureSkipVerify)
+	resp, err := hc.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var response responseType
+	decErr := json.NewDecoder(resp.Body).Decode(&response)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, response.Error())
+	}
+	// ignore this error if we got an invalid status code
+	if decErr != nil && decErr.Error() == "EOF" && resp.StatusCode != http.StatusOK {
+		decErr = nil
+	}
+
+	// If we got a valid decode error, send that back
+	if decErr != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK && response.Err != "" {
+		return &response, fmt.Errorf("received status code %d from server",
+			resp.StatusCode)
+	}
+
+	return &response, nil
+}
+
+func (c *Client) WechatGroup(ctx context.Context, share circle.WechatShare) error {
 	return nil
 }

@@ -25,9 +25,10 @@ import (
 const URL = "https://informationworld.zdjt.com/index.php/api/"
 
 const (
-	login = "user/login"
-	tasks = "mytask/wwtask"
-	detail = "mytask/microdetail"
+	login   = "user/login"          // 登陆
+	tasks   = "mytask/wwtask"       // 任务列表
+	detail  = "mytask/microdetail"  // 任务详情
+	friends = "mytask/forwardlogww" // 朋友圈
 )
 
 type UserService struct{}
@@ -41,7 +42,7 @@ func (s *UserService) New(src circle.Source) (circle.User, error) {
 	return client, nil
 }
 
-type FetchService struct {}
+type FetchService struct{}
 
 func (s *FetchService) New(src circle.Source) (circle.Fetcher, error) {
 	client := &queries.Client{}
@@ -52,3 +53,13 @@ func (s *FetchService) New(src circle.Source) (circle.Fetcher, error) {
 	return client, nil
 }
 
+type ShareService struct {}
+
+func (s *ShareService) New(src circle.Source) (circle.Share, error) {
+	client := &queries.Client{}
+
+	if err := client.Connect(context.TODO(), &src); err != nil {
+		return nil, err
+	}
+	return client, nil
+}
