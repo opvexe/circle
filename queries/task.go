@@ -21,7 +21,7 @@ import (
 	"x6t.io/circle"
 )
 
-func (c *Client) Fetch(ctx context.Context, query circle.Query) (circle.Tasks, error) {
+func (c *Client) Fetch(ctx context.Context, query circle.Fitter) (circle.Tasks, error) {
 
 	return nil, nil
 }

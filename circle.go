@@ -36,7 +36,7 @@ func (e Error) Error() string {
 	return string(e)
 }
 
-type UserSource struct {
+type Source struct {
 	URL                string
 	Account            string
 	Password           string
@@ -46,8 +46,8 @@ type UserSource struct {
 
 // User is an interface for login.
 type User interface {
-	Connect(ctx context.Context, src *UserSource) error
-	Login(ctx context.Context, u UserSource) (Response, error)
+	Connect(ctx context.Context, src *Source) error
+	Login(ctx context.Context, u Source) (Response, error)
 }
 
 type Response interface {
@@ -77,15 +77,15 @@ type Task struct {
 
 type Tasks []Task
 
-// Query is processing parameters.
-type Query struct {
+// Fitter is processing parameters.
+type Fitter struct {
 	Page    int
 	Version string
 }
 
 // Fetcher is an interface for fetch task list.
 type Fetcher interface {
-	Fetch(ctx context.Context, query Query) (Tasks, error)
+	Fetch(ctx context.Context, query Fitter) (Tasks, error)
 }
 
 // Share is an interface for share articles to wechat groups and friends.

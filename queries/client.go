@@ -82,7 +82,7 @@ type Client struct {
 	InsecureSkipVerify bool
 }
 
-func (c *Client) Connect(ctx context.Context, src *circle.UserSource) error {
+func (c *Client) Connect(ctx context.Context, src *circle.Source) error {
 	u, err := url.Parse(src.URL)
 	if err != nil {
 		return err
@@ -102,7 +102,23 @@ type result struct {
 	Err      error
 }
 
-func (c *Client) Login(ctx context.Context, u circle.UserSource) (circle.Response, error) {
+func (c *Client) Login(ctx context.Context, u circle.Source) (circle.Response, error)   {
+	res,err := c.login(ctx,u)
+	if err!=nil{
+		return nil, err
+	}
+
+	octets, err := res.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	fmt.Println(octets)
+	return nil,nil
+}
+
+
+func (c *Client) login(ctx context.Context, u circle.Source) (circle.Response, error) {
 	resps := make(chan result)
 	go func() {
 		resp, err := c.Get(c.URL, u)
@@ -135,7 +151,7 @@ func (r *responseType) Error() string {
 	return ""
 }
 
-func (c *Client) Get(u *url.URL, q circle.UserSource) (circle.Response, error) {
+func (c *Client) Get(u *url.URL, q circle.Source) (circle.Response, error) {
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
