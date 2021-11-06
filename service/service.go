@@ -39,3 +39,15 @@ func (s *UserService) New(src circle.Source) (circle.User, error) {
 	}
 	return client, nil
 }
+
+type FetchService struct {}
+
+func (s *FetchService) New(src circle.Source) (circle.Fetcher, error) {
+	client := &queries.Client{}
+
+	if err := client.Connect(context.TODO(), &src); err != nil {
+		return nil, err
+	}
+	return client, nil
+}
+

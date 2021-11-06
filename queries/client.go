@@ -79,6 +79,7 @@ func init() {
 
 type Client struct {
 	URL                *url.URL
+	Token              string
 	InsecureSkipVerify bool
 }
 
@@ -93,7 +94,12 @@ func (c *Client) Connect(ctx context.Context, src *circle.Source) error {
 		c.InsecureSkipVerify = src.InsecureSkipVerify
 	}
 
+	if src.Token != "" {
+		c.Token = src.Token
+	}
+
 	c.URL = u
+
 	return nil
 }
 
@@ -103,7 +109,7 @@ type result struct {
 }
 
 type showUserinfo struct {
-	UserInfo  circle.UserInfo `json:"userinfo"`
+	UserInfo circle.UserInfo `json:"userinfo"`
 }
 
 func (c *Client) Login(ctx context.Context, u circle.Source) (*circle.UserInfo, error) {
@@ -127,7 +133,7 @@ func (c *Client) Login(ctx context.Context, u circle.Source) (*circle.UserInfo, 
 func (c *Client) login(ctx context.Context, u circle.Source) (circle.Response, error) {
 	resps := make(chan result)
 	go func() {
-		resp, err := c.Get(c.URL, u)
+		resp, err := c.getAccountLogin(c.URL, u)
 		resps <- result{resp, err}
 	}()
 
@@ -141,8 +147,8 @@ func (c *Client) login(ctx context.Context, u circle.Source) (circle.Response, e
 
 type responseType struct {
 	Results json.RawMessage `json:"data,omitempty"`
-	Err     int             `json:"code,omitempty"` // code status
-	V2Err   string          `json:"msg,omitempty"`  // error message
+	Code    int             `json:"code,omitempty"` // code status
+	Err     string          `json:"msg,omitempty"`  // error message
 }
 
 // MarshalJSON returns the raw results bytes from the response
@@ -151,13 +157,13 @@ func (r responseType) MarshalJSON() ([]byte, error) {
 }
 
 func (r *responseType) Error() string {
-	if r.Err != 1 {
-		return r.V2Err
+	if r.Code != 1 {
+		return r.Err
 	}
 	return ""
 }
 
-func (c *Client) Get(u *url.URL, q circle.Source) (circle.Response, error) {
+func (c *Client) getAccountLogin(u *url.URL, q circle.Source) (circle.Response, error) {
 	req, err := http.NewRequest("GET", u.String(), nil)
 	if err != nil {
 		return nil, err
@@ -195,7 +201,7 @@ func (c *Client) Get(u *url.URL, q circle.Source) (circle.Response, error) {
 		return nil, err
 	}
 
-	if resp.StatusCode != http.StatusOK && response.V2Err != "" {
+	if resp.StatusCode != http.StatusOK && response.Err != "" {
 		return &response, fmt.Errorf("received status code %d from server",
 			resp.StatusCode)
 	}

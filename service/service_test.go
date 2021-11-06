@@ -23,7 +23,7 @@ import (
 	"x6t.io/circle"
 )
 
-func TestUserService_New(t *testing.T) {
+func TestUserService_New_Login(t *testing.T) {
 	type args struct {
 		src circle.Source
 	}
@@ -33,7 +33,7 @@ func TestUserService_New(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "service-user",
+			name: "service-login",
 			args: args{
 				src: circle.Source{
 					URL:             fmt.Sprintf("%s%s", URL, login),
@@ -54,6 +54,46 @@ func TestUserService_New(t *testing.T) {
 				return
 			}
 			resp, err := got.Login(context.TODO(), tt.args.src)
+			if err != nil {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if resp == nil {
+				t.Errorf("New() got = %v", got)
+			}
+		})
+	}
+}
+
+func TestUserService_New_Task_List(t *testing.T) {
+	type args struct {
+		src circle.Source
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "service-fetch",
+			args: args{
+				src: circle.Source{
+					URL: fmt.Sprintf("%s%s", URL, tasks),
+					Token: "eb470e70-14dc-4c8b-8e89-60d3e7aba278",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			s := &FetchService{}
+			got, err := s.New(tt.args.src)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			resp, err := got.Fetch(context.TODO(),circle.Fitter{Page: "1",Version: "1.0.4"})
 			if err != nil {
 				t.Errorf("New() error = %v, wantErr %v", err, tt.wantErr)
 				return

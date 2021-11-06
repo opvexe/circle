@@ -31,6 +31,7 @@ func (e Error) Error() string {
 
 type Source struct {
 	URL                string
+	Token              string
 	Account            string
 	Password           string
 	Tuisongclientid    string
@@ -83,7 +84,7 @@ type Tasks []Task
 
 // Fitter is processing parameters.
 type Fitter struct {
-	Page    int
+	Page    string
 	Version string
 }
 
