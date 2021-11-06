@@ -1,2 +1,3 @@
-- 登陆接口          PASS
-- 任务列表接口       PASS
+- 登陆接口       Login    PASS
+- 任务列表接口    Fetch    PASS
+- 任务(文章)详情  Detail   PASS

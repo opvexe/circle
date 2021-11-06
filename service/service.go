@@ -27,6 +27,7 @@ const URL = "https://informationworld.zdjt.com/index.php/api/"
 const (
 	login = "user/login"
 	tasks = "mytask/wwtask"
+	detail = "mytask/microdetail"
 )
 
 type UserService struct{}

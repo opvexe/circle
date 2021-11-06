@@ -29,7 +29,6 @@ type showTaskList struct {
 	Tasks circle.Tasks `json:"data"`
 }
 
-
 func (c *Client) Fetch(ctx context.Context, f circle.Fitter) (circle.Tasks, error) {
 	res, err := c.fetch(ctx, f)
 	if err != nil {
@@ -77,6 +76,87 @@ func (c *Client) getFetchTasks(u *url.URL, q circle.Fitter) (circle.Response, er
 	params := req.URL.Query()
 	params.Set("page", q.Page)
 	params.Set("code", q.Version)
+
+	req.URL.RawQuery = params.Encode()
+	hc := &http.Client{}
+	hc.Transport = SharedTransport(c.InsecureSkipVerify)
+	resp, err := hc.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	defer resp.Body.Close()
+
+	var response responseType
+	decErr := json.NewDecoder(resp.Body).Decode(&response)
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("received status code %d from server: err: %s", resp.StatusCode, response.Error())
+	}
+	// ignore this error if we got an invalid status code
+	if decErr != nil && decErr.Error() == "EOF" && resp.StatusCode != http.StatusOK {
+		decErr = nil
+	}
+
+	// If we got a valid decode error, send that back
+	if decErr != nil {
+		return nil, err
+	}
+
+	if resp.StatusCode != http.StatusOK && response.Err != "" {
+		return &response, fmt.Errorf("received status code %d from server",
+			resp.StatusCode)
+	}
+
+	return &response, nil
+}
+
+func (c *Client) Detail(ctx context.Context, microgrid string) (*circle.Task,error)  {
+	res, err := c.detail(ctx, microgrid)
+	if err != nil {
+		return nil, err
+	}
+
+	octets, err := res.MarshalJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	results := circle.Task{}
+	if err := json.Unmarshal(octets, &results); err != nil {
+		return nil, err
+	}
+	return &results, nil
+}
+
+func (c *Client) detail(ctx context.Context,m string) (circle.Response, error) {
+	resps := make(chan result)
+	go func() {
+		resp, err := c.getFetchDetail(c.URL, m)
+		resps <- result{resp, err}
+	}()
+
+	select {
+	case resp := <-resps:
+		return resp.Response, resp.Err
+	case <-ctx.Done():
+		return nil, circle.ErrUpstreamTimeout
+	}
+}
+
+func (c *Client) getFetchDetail(u *url.URL, q string) (circle.Response, error) {
+	req, err := http.NewRequest("GET", u.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+	if c.Token == "" {
+		return nil, fmt.Errorf("token must be empty")
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("token", c.Token)
+
+	params := req.URL.Query()
+	params.Set("microid", q)
 
 	req.URL.RawQuery = params.Encode()
 	hc := &http.Client{}
