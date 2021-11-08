@@ -43,7 +43,7 @@ dockers:
     ids:
       - circled
     image_templates:
-      - "docker.gridsumdissector.com/compass/circled-amd64:{{ .Tag }}-{{.ShortCommit}}"
+      - "shumintao/circle:{{ .Tag }}-{{.ShortCommit}}"
     dockerfile: Dockerfile
     build_flag_templates:
       - "--platform=linux/amd64"
@@ -61,7 +61,7 @@ dockers:
 
 docker_manifests:
   - image_templates:
-      - "docker.gridsumdissector.com/compass/circled-amd64:{{ .Tag }}-{{.ShortCommit}}"
+      - "shumintao/circle:{{ .Tag }}-{{.ShortCommit}}"
       -
 archives:
   - replacements:
