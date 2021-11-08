@@ -20,6 +20,9 @@ import "context"
 
 const (
 	ErrUpstreamTimeout = Error("request to backend timed out")
+	ErrAccountEmpty    = Error("request account must not be empty")
+	ErrPasswordEmpty   = Error("request password must not be empty")
+	ErrClientidEmpty   = Error("request client id must not be empty")
 )
 
 // Error is a domain error encountered while processing circle requests
@@ -127,5 +130,5 @@ type Tasker interface {
 	// StatisticsTask Statistical work.
 	StatisticsTask(ctx context.Context, token string) (Tasks, error)
 	// ProcessTask Processing tasks.
-	ProcessTask(ctx context.Context) error
+	ProcessTask(ctx context.Context, tasks Tasks, token string) error
 }

@@ -35,12 +35,12 @@ type TaskService struct {
 	wg      errgroup.Group
 }
 
-func NewTaskService(source circle.Source) *TaskService {
+func NewTaskService(source circle.Source, config circle.Config) *TaskService {
 	source = circle.Source{
 		URL:             fmt.Sprintf("%s%s", URL, login),
-		Account:         "chenxue",
-		Password:        "ZHENdong123",
-		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
+		Account:         config.Account,
+		Password:        config.Password,
+		Tuisongclientid: config.Tuisongclientid,
 	}
 	return &TaskService{
 		taskSvc: dottask.StartNewService(),
@@ -63,8 +63,12 @@ func (s *TaskService) Task(ctx *dottask.TaskContext) error {
 	if err != nil {
 		return err
 	}
+	tasks, err := s.StatisticsTask(context.Background(), userInfo.Token)
+	if err != nil {
+		return err
+	}
 
-	return nil
+	return s.ProcessTask(context.Background(), tasks, userInfo.Token)
 }
 
 func (s *TaskService) Login(ctx context.Context, u circle.Source) (*circle.UserInfo, error) {
@@ -118,12 +122,54 @@ func (s *TaskService) StatisticsTask(ctx context.Context, token string) (circle.
 }
 
 func (s *TaskService) AnalyzeUnfinishedTasks(ctx context.Context, tasks circle.Tasks) (circle.Tasks, error) {
-
-	return nil, nil
+	var unfinished circle.Tasks
+	for _, task := range tasks {
+		if task.UserCircleCount < task.CircleCountRw {
+			unfinished = append(unfinished, task)
+			continue
+		}
+		if task.UserGroupCount < task.GroupCountRw {
+			unfinished = append(unfinished, task)
+			continue
+		}
+		if task.UserReadCount < task.ReadCount {
+			unfinished = append(unfinished, task)
+			continue
+		}
+	}
+	return unfinished, nil
 }
 
-func (s *TaskService) ProcessTask(ctx context.Context) error {
+func (s *TaskService) ProcessTask(ctx context.Context, tasks circle.Tasks, token string) error {
+	share, err := NewShareService().New(circle.Source{
+		URL:   fmt.Sprintf("%s%s", URL, wechat),
+		Token: token,
+	})
+	if err != nil {
+		return err
+	}
+	for _, task := range tasks {
+		if task.UserCircleCount < task.CircleCountRw { // 朋友圈
+			for i := 0; i < task.CircleCountRw-task.UserCircleCount; i++ {
+				_ = share.Wechat(ctx, circle.WechatShare{
+					Microgrid: cast.ToString(task.ID),
+					Type:      circle.Friends,
+				})
+			}
+		}
+		if task.UserGroupCount < task.GroupCountRw { // 微信群
+			for i := 0; i < task.GroupCountRw-task.UserGroupCount; i++ {
+				_ = share.Wechat(ctx, circle.WechatShare{
+					Microgrid: cast.ToString(task.ID),
+					Type:      circle.Group,
+				})
+			}
+		}
 
+		if task.UserReadCount < task.ReadCount { // 阅读
+
+		}
+	}
 	return nil
 }
 
