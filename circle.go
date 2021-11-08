@@ -29,6 +29,7 @@ func (e Error) Error() string {
 	return string(e)
 }
 
+// Source is a user request source.
 type Source struct {
 	URL                string
 	Token              string
@@ -38,6 +39,7 @@ type Source struct {
 	InsecureSkipVerify bool
 }
 
+// UserInfo return user detail information.
 type UserInfo struct {
 	ID         int    `json:"id,omitempty"`
 	Mobile     string `json:"mobile,omitempty"`
@@ -67,7 +69,7 @@ type Task struct {
 	// containing user is the statistics of the number of tasks completed by the user prefix.
 	ReadCount       int `json:"read_count,omitempty"`        // 任务阅读数
 	UserReadCount   int `json:"user_read_count,omitempty"`   // 用户阅读数
-	FinishScore     int `json:"finish_score,omitempty"`      // 任务积分
+	FinishScore     int `json:"finish_score,omitempty"`       // 任务积分
 	UserScore       int `json:"user_score,omitempty"`        // 用户当前积分
 	GroupCountRw    int `json:"group_count_rw,omitempty"`    // 任务微信群数
 	UserGroupCount  int `json:"user_group_count,omitempty"`  // 用户微信群数
@@ -118,7 +120,7 @@ type Read interface {
 // Tasker is an interface for dispose task.
 type Tasker interface {
 	// StatisticsTask 统计任务
-	StatisticsTask(ctx context.Context) (Tasks,error)
+	StatisticsTask(ctx context.Context) (Tasks, error)
 	// ProcessTask 处理任务
 	ProcessTask(ctx context.Context) error
 }
