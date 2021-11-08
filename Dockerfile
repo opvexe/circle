@@ -11,12 +11,15 @@ ENV GO111MODULE=on
 ENV GOPROXY=https://goproxy.io,direct
 
 # Copy the go source
+COPY cmd     cmd
 COPY queries queries
 COPY service service
 COPY circle.go circle.go
+COPY signal.go signal.go
+COPY config.go config.go
 
 # Build
-RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -o circled circle/cmd/main.go
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -o circled ./cmd/main.go
 
 FROM --platform=$BUILDPLATFORM alpine:latest
 WORKDIR /
