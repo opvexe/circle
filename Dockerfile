@@ -1,5 +1,4 @@
 FROM --platform=$BUILDPLATFORM golang:1.16 as builder
-ENV TZ=Asia/Shanghai LANG="C.UTF-8"
 ARG TARGETARCH
 ARG TARGETOS
 
@@ -22,6 +21,7 @@ COPY config.go config.go
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -o circled ./cmd/main.go
 
 FROM --platform=$BUILDPLATFORM alpine:latest
+ENV TZ=Asia/Shanghai LANG="C.UTF-8"
 WORKDIR /
 COPY --from=builder /workspace/circled .
 ENTRYPOINT ["/circled"]
