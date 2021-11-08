@@ -49,7 +49,7 @@ func NewTaskService(config circle.Config) *TaskService {
 	}
 }
 
-func (s *TaskService) Open() error {
+func (s *TaskService) Open(ctx context.Context) error {
 	_, err := s.taskSvc.CreateCronTask(TaskName, true, s.config.Express, s.Task, nil)
 	if err != nil {
 		return err
@@ -174,8 +174,11 @@ func (s *TaskService) ProcessTask(ctx context.Context, tasks circle.Tasks, token
 	return nil
 }
 
-func (s *TaskService) Close() error {
-	defer s.taskSvc.StopAllTask()
+func (s *TaskService) Close(ctx context.Context) error {
+	s.taskSvc.StopAllTask()
 
+	if err := s.wg.Wait(); err != nil {
+		return err
+	}
 	return nil
 }

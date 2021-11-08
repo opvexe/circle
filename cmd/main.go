@@ -16,6 +16,38 @@ limitations under the License.
 
 package main
 
-func main() {
+import (
+	"context"
+	"github.com/vrischmann/envconfig"
+	"time"
+	"x6t.io/circle"
+	"x6t.io/circle/service"
+)
 
+func main() {
+	config := circle.NewConfig()
+	if err:=envconfig.InitWithPrefix(config, "CCL");err!=nil{
+		circle.CheckErr(err)
+	}
+	if err:=cmdRun(context.Background(),*config);err!=nil{
+		circle.CheckErr(err)
+	}
+}
+
+func cmdRun(ctx context.Context, o circle.Config) error {
+
+	// Start the launcher and wait for it to exit on SIGINT or SIGTERM.
+	runCtx := circle.WithStandardSignals(ctx)
+	svc :=service.NewTaskService(o)
+	if err:=svc.Open(runCtx);err!=nil{
+		return err
+	}
+
+	<-runCtx.Done()
+
+	// Tear down the launcher, allowing it a few seconds to finish any
+	// in-progress requests.
+	shutdownCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+	defer cancel()
+	return svc.Close(shutdownCtx)
 }

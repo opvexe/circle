@@ -17,10 +17,10 @@ limitations under the License.
 package circle
 
 type Config struct {
-	Account         string `mapstructure:"account"`
-	Password        string `mapstructure:"password"`
-	Tuisongclientid string `mapstructure:"tuisongclientid"`
-	Express			string `mapstructure:"express"`
+	Account         string  `envconfig:"optional"`
+	Password        string  `envconfig:"optional"`
+	Tuisongclientid string  `envconfig:"optional"`
+	Express			string  `envconfig:"optional"`
 }
 
 func NewConfig() *Config {

@@ -16,7 +16,11 @@ limitations under the License.
 
 package circle
 
-import "context"
+import (
+	"context"
+	"fmt"
+	"os"
+)
 
 const (
 	ErrUpstreamTimeout = Error("request to backend timed out")
@@ -131,4 +135,12 @@ type Tasker interface {
 	StatisticsTask(ctx context.Context, token string) (Tasks, error)
 	// ProcessTask Processing tasks.
 	ProcessTask(ctx context.Context, tasks Tasks, token string) error
+}
+
+// CheckErr prints the msg with the prefix 'Error:' and exits with error code 1. If the msg is nil, it does nothing.
+func CheckErr(msg interface{}) {
+	if msg != nil {
+		fmt.Fprintln(os.Stderr, "Error:", msg)
+		os.Exit(1)
+	}
 }
