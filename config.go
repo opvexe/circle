@@ -17,9 +17,10 @@ limitations under the License.
 package circle
 
 type Config struct {
-	Account         string
-	Password        string
-	Tuisongclientid string
+	Account         string `mapstructure:"account"`
+	Password        string `mapstructure:"password"`
+	Tuisongclientid string `mapstructure:"tuisongclientid"`
+	Express			string `mapstructure:"express"`
 }
 
 func NewConfig() *Config {
@@ -27,6 +28,7 @@ func NewConfig() *Config {
 		Account:         "chenxue",
 		Password:        "ZHENdong123",
 		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
+		Express: "0 0 7 * * *",
 	}
 }
 

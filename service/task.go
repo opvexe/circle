@@ -33,23 +33,24 @@ type TaskService struct {
 	taskSvc *dottask.TaskService
 	source  circle.Source
 	wg      errgroup.Group
+	config   circle.Config
 }
 
-func NewTaskService(source circle.Source, config circle.Config) *TaskService {
-	source = circle.Source{
-		URL:             fmt.Sprintf("%s%s", URL, login),
-		Account:         config.Account,
-		Password:        config.Password,
-		Tuisongclientid: config.Tuisongclientid,
-	}
+func NewTaskService(config circle.Config) *TaskService {
 	return &TaskService{
 		taskSvc: dottask.StartNewService(),
-		source:  source,
+		source:  circle.Source{
+			URL:             fmt.Sprintf("%s%s", URL, login),
+			Account:         config.Account,
+			Password:        config.Password,
+			Tuisongclientid: config.Tuisongclientid,
+		},
+		config: config,
 	}
 }
 
 func (s *TaskService) Open() error {
-	_, err := s.taskSvc.CreateCronTask(TaskName, true, "", s.Task, nil)
+	_, err := s.taskSvc.CreateCronTask(TaskName, true, s.config.Express, s.Task, nil)
 	if err != nil {
 		return err
 	}
