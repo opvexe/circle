@@ -19,3 +19,8 @@ This project is for study and reference only, not for commercial use.
 - https://github.com/devfeel/dottask
 
 
+# Docker 
+
+```api
+docker run -itd shumintao/circle:v1.0.1-b87e170
+```
