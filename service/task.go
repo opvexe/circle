@@ -23,6 +23,7 @@ import (
 	dottask "github.com/devfeel/dottask"
 	"github.com/spf13/cast"
 	"golang.org/x/sync/errgroup"
+	"log"
 	"sync"
 	"x6t.io/circle"
 )
@@ -33,13 +34,13 @@ type TaskService struct {
 	taskSvc *dottask.TaskService
 	source  circle.Source
 	wg      errgroup.Group
-	config   circle.Config
+	config  circle.Config
 }
 
 func NewTaskService(config circle.Config) *TaskService {
 	return &TaskService{
 		taskSvc: dottask.StartNewService(),
-		source:  circle.Source{
+		source: circle.Source{
 			URL:             fmt.Sprintf("%s%s", URL, login),
 			Account:         config.Account,
 			Password:        config.Password,
@@ -60,16 +61,23 @@ func (s *TaskService) Open(ctx context.Context) error {
 }
 
 func (s *TaskService) Task(ctx *dottask.TaskContext) error {
+	log.Printf("start task task_id: %s", ctx.TaskID)
 	userInfo, err := s.Login(context.Background(), s.source)
 	if err != nil {
-		return err
+		log.Printf("login task error: %s",err.Error())
+		return nil
 	}
 	tasks, err := s.StatisticsTask(context.Background(), userInfo.Token)
 	if err != nil {
-		return err
+		log.Printf("statistics task error: %s",err.Error())
+		return nil
 	}
 
-	return s.ProcessTask(context.Background(), tasks, userInfo.Token)
+	if err := s.ProcessTask(context.Background(), tasks, userInfo.Token); err != nil {
+		log.Printf("process task error: %s",err.Error())
+		return nil
+	}
+	return nil
 }
 
 func (s *TaskService) Login(ctx context.Context, u circle.Source) (*circle.UserInfo, error) {

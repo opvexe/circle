@@ -26,20 +26,19 @@ import (
 
 func main() {
 	config := circle.NewConfig()
-	if err:=envconfig.InitWithPrefix(config, "CCL");err!=nil{
+	if err := envconfig.InitWithPrefix(config, "CCL"); err != nil {
 		circle.CheckErr(err)
 	}
-	if err:=cmdRun(context.Background(),*config);err!=nil{
+	if err := cmdRun(context.Background(), *config); err != nil {
 		circle.CheckErr(err)
 	}
 }
 
 func cmdRun(ctx context.Context, o circle.Config) error {
-
 	// Start the launcher and wait for it to exit on SIGINT or SIGTERM.
 	runCtx := circle.WithStandardSignals(ctx)
-	svc :=service.NewTaskService(o)
-	if err:=svc.Open(runCtx);err!=nil{
+	svc := service.NewTaskService(o)
+	if err := svc.Open(runCtx); err != nil {
 		return err
 	}
 

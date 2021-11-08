@@ -45,4 +45,3 @@ func WithSignals(ctx context.Context, sigs ...os.Signal) context.Context {
 func WithStandardSignals(ctx context.Context) context.Context {
 	return WithSignals(ctx, os.Interrupt, syscall.SIGTERM)
 }
-

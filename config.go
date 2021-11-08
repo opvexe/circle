@@ -17,10 +17,10 @@ limitations under the License.
 package circle
 
 type Config struct {
-	Account         string  `envconfig:"optional"`
-	Password        string  `envconfig:"optional"`
-	Tuisongclientid string  `envconfig:"optional"`
-	Express			string  `envconfig:"optional"`
+	Account         string `envconfig:"optional"`
+	Password        string `envconfig:"optional"`
+	Tuisongclientid string `envconfig:"optional"`
+	Express         string `envconfig:"optional"`
 }
 
 func NewConfig() *Config {
@@ -28,7 +28,7 @@ func NewConfig() *Config {
 		Account:         "chenxue",
 		Password:        "ZHENdong123",
 		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
-		Express: "0 0 7 * * *",
+		Express:         "0 0 7 * * *",
 	}
 }
 
