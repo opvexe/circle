@@ -69,7 +69,7 @@ type Task struct {
 	// containing user is the statistics of the number of tasks completed by the user prefix.
 	ReadCount       int `json:"read_count,omitempty"`        // 任务阅读数
 	UserReadCount   int `json:"user_read_count,omitempty"`   // 用户阅读数
-	FinishScore     int `json:"finish_score,omitempty"`       // 任务积分
+	FinishScore     int `json:"finish_score,omitempty"`      // 任务积分
 	UserScore       int `json:"user_score,omitempty"`        // 用户当前积分
 	GroupCountRw    int `json:"group_count_rw,omitempty"`    // 任务微信群数
 	UserGroupCount  int `json:"user_group_count,omitempty"`  // 用户微信群数
@@ -89,6 +89,11 @@ type Fitter struct {
 	Page    string
 	Version string
 }
+
+const (
+	Offset  = 10
+	Version = "1.0.4"
+)
 
 // Fetcher is an interface for fetch task list.
 type Fetcher interface {
@@ -119,8 +124,8 @@ type Read interface {
 
 // Tasker is an interface for dispose task.
 type Tasker interface {
-	// StatisticsTask 统计任务
-	StatisticsTask(ctx context.Context) (Tasks, error)
-	// ProcessTask 处理任务
+	// StatisticsTask Statistical work.
+	StatisticsTask(ctx context.Context, token string) (Tasks, error)
+	// ProcessTask Processing tasks.
 	ProcessTask(ctx context.Context) error
 }

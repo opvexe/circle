@@ -33,6 +33,10 @@ const (
 
 type UserService struct{}
 
+func NewUserService() *UserService {
+	return &UserService{}
+}
+
 func (s *UserService) New(src circle.Source) (circle.User, error) {
 	client := &queries.Client{}
 
@@ -44,6 +48,10 @@ func (s *UserService) New(src circle.Source) (circle.User, error) {
 
 type FetchService struct{}
 
+func NewFetchService() *FetchService {
+	return &FetchService{}
+}
+
 func (s *FetchService) New(src circle.Source) (circle.Fetcher, error) {
 	client := &queries.Client{}
 
@@ -54,6 +62,10 @@ func (s *FetchService) New(src circle.Source) (circle.Fetcher, error) {
 }
 
 type ShareService struct{}
+
+func NewShareService() *ShareService {
+	return &ShareService{}
+}
 
 func (s *ShareService) New(src circle.Source) (circle.Share, error) {
 	client := &queries.Client{}
