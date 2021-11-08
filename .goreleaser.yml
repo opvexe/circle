@@ -62,7 +62,6 @@ dockers:
 docker_manifests:
   - image_templates:
       - "shumintao/circle:{{ .Tag }}-{{.ShortCommit}}"
-      -
 archives:
   - replacements:
       darwin: Darwin
