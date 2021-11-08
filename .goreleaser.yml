@@ -37,6 +37,8 @@ builds:
       - PKG_CONFIG=$GOPATH/bin/pkg-config
       - MACOSX_DEPLOYMENT_TARGET=10.11
     binary: circled
+gitlab_urls:
+  api: https://gitlab.com/
 dockers:
   - goos: linux
     goarch: amd64
