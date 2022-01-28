@@ -14,17 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package circle
+package app
 
-type Config struct {
+import (
+	"fmt"
+	"x6t.io/circle"
+)
+
+type RunServerConfig struct {
 	Account         string `envconfig:"optional"`
 	Password        string `envconfig:"optional"`
 	Tuisongclientid string `envconfig:"optional"`
 	Express         string `envconfig:"optional"`
 }
 
-func NewConfig() *Config {
-	return &Config{
+func NewRunServerConfig() *RunServerConfig {
+	return &RunServerConfig{
 		Account:         "chenxue",
 		Password:        "ZHENdong123",
 		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
@@ -32,15 +37,23 @@ func NewConfig() *Config {
 	}
 }
 
-func (c *Config) Validate() error {
+func (c *RunServerConfig) Validate() error {
 	if len(c.Account) == 0 {
-		return ErrAccountEmpty
+		return fmt.Errorf("account must be not empty")
 	}
 	if len(c.Password) == 0 {
-		return ErrPasswordEmpty
+		return fmt.Errorf("password must be not empty")
 	}
 	if len(c.Tuisongclientid) == 0 {
-		return ErrClientidEmpty
+		return fmt.Errorf("clientid must be not empty")
 	}
 	return nil
+}
+
+func (c *RunServerConfig) PreRun() circle.Source {
+	return circle.Source{
+		Account:         c.Account,
+		Password:        c.Password,
+		Tuisongclientid: c.Tuisongclientid,
+	}
 }

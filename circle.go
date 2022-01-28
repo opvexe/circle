@@ -18,15 +18,11 @@ package circle
 
 import (
 	"context"
-	"fmt"
-	"os"
 )
 
 const (
-	ErrUpstreamTimeout = Error("request to backend timed out")
-	ErrAccountEmpty    = Error("request account must not be empty")
-	ErrPasswordEmpty   = Error("request password must not be empty")
-	ErrClientidEmpty   = Error("request client id must not be empty")
+	Offset  = 10
+	Version = "1.0.4"
 )
 
 // Error is a domain error encountered while processing circle requests
@@ -58,15 +54,7 @@ type UserInfo struct {
 	Lastname   string `json:"lastname,omitempty"`
 }
 
-// User is an interface for login.
-type User interface {
-	Connect(ctx context.Context, src *Source) error
-	Login(ctx context.Context, u Source) (*UserInfo, error)
-}
-
-type Response interface {
-	MarshalJSON() ([]byte, error)
-}
+type Tasks []Task
 
 type Task struct {
 	ID      int    `json:"id,omitempty"`       // 文章id
@@ -89,28 +77,18 @@ type Task struct {
 	MicroURL string `json:"micro_url,omitempty"` // 微信分享链接
 }
 
-type Tasks []Task
-
 // Fitter is processing parameters.
 type Fitter struct {
 	Page    string
 	Version string
 }
 
-const (
-	Offset  = 10
-	Version = "1.0.4"
-)
+type WechatShares []WechatShare
 
-// Fetcher is an interface for fetch task list.
-type Fetcher interface {
-	Fetch(ctx context.Context, query Fitter) (Tasks, error)
-	Detail(ctx context.Context, microgrid string) (*Task, error)
-}
-
+// WechatShare define WeChat sharing parameters.
 type WechatShare struct {
-	Microgrid string
-	Type      string
+	Microgrid string // task id.
+	Type      string // task type.
 }
 
 type WechatType string
@@ -120,27 +98,24 @@ const (
 	Group   = "2" // 微信群
 )
 
-// Share is an interface for share articles to wechat groups and friends.
-type Share interface {
+// Client is an interface for login.
+type Client interface {
+	Connect(ctx context.Context, src Source) error
+	Login(ctx context.Context, u Source) (*UserInfo, error)
+	// Fetch is an interface for fetch task list.
+	Fetch(ctx context.Context, query Fitter) (Tasks, error)
+	Detail(ctx context.Context, microgrid string) (*Task, error)
+	// Wechat is an interface for share articles to wechat groups and friends.
 	Wechat(ctx context.Context, share WechatShare) error
 }
 
-type Read interface {
-	SharedByOtherRead(ctx context.Context) error
+// Response Serialize returns json response data.
+type Response interface {
+	MarshalJSON() ([]byte, error)
 }
 
-// Tasker is an interface for dispose task.
-type Tasker interface {
-	// StatisticsTask Statistical work.
-	StatisticsTask(ctx context.Context, token string) (Tasks, error)
-	// ProcessTask Processing tasks.
-	ProcessTask(ctx context.Context, tasks Tasks, token string) error
-}
-
-// CheckErr prints the msg with the prefix 'Error:' and exits with error code 1. If the msg is nil, it does nothing.
-func CheckErr(msg interface{}) {
-	if msg != nil {
-		fmt.Fprintln(os.Stderr, "Error:", msg)
-		os.Exit(1)
-	}
+type Service interface {
+	Get(ctx context.Context, source Source) (Tasks, error)
+	UnfinishedWechatShares(tasks Tasks) (WechatShares, error)
+	Do(ctx context.Context, wc WechatShare, token string) error
 }

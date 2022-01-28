@@ -14,17 +14,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package circle
 
 import (
-	"github.com/spf13/cobra"
-	"x6t.io/circle/cmd/app"
+	"encoding/json"
+	"fmt"
+	"runtime"
+	"time"
 )
 
-func main() {
-	cmd := app.NewCircleCommand()
+const gitVersion = "v1.0.0"
 
-	if err := cmd.Execute(); err != nil {
-		cobra.CheckErr(err)
+type Info struct {
+	GitVersion string
+	BuildDate  string
+	GoVersion  string
+	Compiler   string
+	Platform   string
+}
+
+func (info Info) String() string {
+	jsonString, _ := json.Marshal(info)
+	return string(jsonString)
+}
+
+func Get() Info {
+	return Info{
+		GitVersion: gitVersion,
+		BuildDate:  time.Now().Format("2006-01-02 15:04:05"),
+		GoVersion:  runtime.Version(),
+		Compiler:   runtime.Compiler,
+		Platform:   fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH),
 	}
 }

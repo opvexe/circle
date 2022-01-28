@@ -14,17 +14,40 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package app
 
 import (
+	"context"
 	"github.com/spf13/cobra"
-	"x6t.io/circle/cmd/app"
+	"x6t.io/circle"
 )
 
-func main() {
-	cmd := app.NewCircleCommand()
+func NewCircleCommand() *cobra.Command {
+	s := NewRunServerConfig()
 
-	if err := cmd.Execute(); err != nil {
-		cobra.CheckErr(err)
+	cmd := &cobra.Command{
+		Use:  "circle",
+		Long: "",
+		RunE: func(cmd *cobra.Command, args []string) error {
+
+			return Run(s, circle.SetupSignalHandler())
+		},
+		SilenceUsage: false,
 	}
+
+	versionCmd := &cobra.Command{
+		Use:   "version",
+		Short: "Print the version of circle",
+		Run: func(cmd *cobra.Command, args []string) {
+			cmd.Println(circle.Get())
+		},
+	}
+
+	cmd.AddCommand(versionCmd)
+	return cmd
+}
+
+func Run(opt *RunServerConfig, ctx context.Context) error {
+
+	return nil
 }

@@ -41,7 +41,7 @@ func (c *Client) wechat(ctx context.Context, u circle.WechatShare) (circle.Respo
 	case resp := <-resps:
 		return resp.Response, resp.Err
 	case <-ctx.Done():
-		return nil, circle.ErrUpstreamTimeout
+		return nil, ErrUpstreamTimeout
 	}
 }
 

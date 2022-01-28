@@ -23,25 +23,27 @@ import (
 	"syscall"
 )
 
-// WithSignals returns a context that is canceled with any signal in sigs.
-func WithSignals(ctx context.Context, sigs ...os.Signal) context.Context {
-	sigCh := make(chan os.Signal, 1)
-	signal.Notify(sigCh, sigs...)
+var (
+	onlyOneSignalHandler = make(chan struct{})
+	shutdownSignals      = []os.Signal{os.Interrupt, syscall.SIGTERM}
+)
 
-	ctx, cancel := context.WithCancel(ctx)
+// SetupSignalHandler registers for SIGTERM and SIGINT. A context is returned
+// which is canceled on one of these signals. If a second signal is caught, the program
+// is terminated with exit code 1.
+func SetupSignalHandler() context.Context {
+	close(onlyOneSignalHandler) // panics when called twice
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, shutdownSignals...)
 	go func() {
-		defer cancel()
-		select {
-		case <-ctx.Done():
-			return
-		case <-sigCh:
-			return
-		}
+		<-c
+		cancel()
+		<-c
+		os.Exit(1) // second signal. Exit directly.
 	}()
-	return ctx
-}
 
-// WithStandardSignals cancels the context on os.Interrupt, syscall.SIGTERM.
-func WithStandardSignals(ctx context.Context) context.Context {
-	return WithSignals(ctx, os.Interrupt, syscall.SIGTERM)
+	return ctx
 }

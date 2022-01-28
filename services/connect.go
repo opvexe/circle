@@ -1,5 +1,5 @@
 /*
-Copyright 2021 The Gridsum Authors.
+Copyright 2021 The SHUMIN Authors.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -14,33 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package service
+package services
 
 import (
-	dottask "github.com/devfeel/dottask"
-	"testing"
+	"context"
 	"x6t.io/circle"
+	"x6t.io/circle/queries"
 )
 
-func TestTaskService_Task(t *testing.T) {
+type Connect struct{}
 
-	tests := []struct {
-		name    string
-		fields  *TaskService
-		wantErr bool
-	}{
-		{
-			name:    "task",
-			fields:  NewTaskService(*circle.NewConfig()),
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
+func NewConnectService() *Connect {
+	return &Connect{}
+}
 
-			if err := tt.fields.Task(&dottask.TaskContext{}); (err != nil) != tt.wantErr {
-				t.Errorf("Task() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
+func (c *Connect) Connect(ctx context.Context, source circle.Source) (*queries.Client, error) {
+	client := &queries.Client{}
+	if err := client.Connect(ctx, source); err != nil {
+		return nil, err
 	}
+	return client, nil
 }

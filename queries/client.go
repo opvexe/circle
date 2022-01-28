@@ -28,9 +28,7 @@ import (
 	"x6t.io/circle"
 )
 
-var _ circle.User = &Client{}
-var _ circle.Fetcher = &Client{}
-var _ circle.Share = &Client{}
+var _ circle.UserService = &Client{}
 
 // Shared transports for all clients to prevent leaking connections
 var skipVerifyTransport *http.Transport
@@ -83,7 +81,7 @@ type Client struct {
 	InsecureSkipVerify bool
 }
 
-func (c *Client) Connect(ctx context.Context, src *circle.Source) error {
+func (c *Client) Connect(ctx context.Context, src circle.Source) error {
 	u, err := url.Parse(src.URL)
 	if err != nil {
 		return err
@@ -141,7 +139,7 @@ func (c *Client) login(ctx context.Context, u circle.Source) (circle.Response, e
 	case resp := <-resps:
 		return resp.Response, resp.Err
 	case <-ctx.Done():
-		return nil, circle.ErrUpstreamTimeout
+		return nil, ErrUpstreamTimeout
 	}
 }
 

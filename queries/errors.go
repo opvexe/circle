@@ -14,17 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package main
+package queries
 
-import (
-	"github.com/spf13/cobra"
-	"x6t.io/circle/cmd/app"
-)
+import "x6t.io/circle"
 
-func main() {
-	cmd := app.NewCircleCommand()
-
-	if err := cmd.Execute(); err != nil {
-		cobra.CheckErr(err)
-	}
-}
+const ErrUpstreamTimeout = circle.Error("request to backend timed out")

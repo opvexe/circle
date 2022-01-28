@@ -58,7 +58,7 @@ func (c *Client) fetch(ctx context.Context, u circle.Fitter) (circle.Response, e
 	case resp := <-resps:
 		return resp.Response, resp.Err
 	case <-ctx.Done():
-		return nil, circle.ErrUpstreamTimeout
+		return nil, ErrUpstreamTimeout
 	}
 }
 
@@ -140,7 +140,7 @@ func (c *Client) detail(ctx context.Context, m string) (circle.Response, error) 
 	case resp := <-resps:
 		return resp.Response, resp.Err
 	case <-ctx.Done():
-		return nil, circle.ErrUpstreamTimeout
+		return nil, ErrUpstreamTimeout
 	}
 }
 
