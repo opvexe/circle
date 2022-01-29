@@ -14,40 +14,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package app
+package services
 
 import (
-	"context"
-	"github.com/spf13/cobra"
+	"testing"
 	"x6t.io/circle"
 )
 
-func NewCircleCommand() *cobra.Command {
-	s := NewRunServerConfig()
+func TestNewAssignment(t *testing.T) {
+	assig := NewAssignment()
+	defer assig.Close()
 
-	cmd := &cobra.Command{
-		Use:  "circle",
-		Long: "",
-		RunE: func(cmd *cobra.Command, args []string) error {
-
-			return Run(s, circle.SetupSignalHandler())
-		},
-		SilenceUsage: false,
+	if err := assig.Pub(circle.Source{
+		Account:         "chenxue",
+		Password:        "ZHENdong123",
+		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
+	}); err != nil {
+		t.Errorf("pub assignment error :%s", err)
 	}
-
-	versionCmd := &cobra.Command{
-		Use:   "version",
-		Short: "Print the version of circle",
-		Run: func(cmd *cobra.Command, args []string) {
-			cmd.Println(circle.Get())
-		},
-	}
-
-	cmd.AddCommand(versionCmd)
-	return cmd
-}
-
-func Run(opt *RunServerConfig, ctx context.Context) error {
-
-	return nil
 }

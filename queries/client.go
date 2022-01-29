@@ -28,7 +28,7 @@ import (
 	"x6t.io/circle"
 )
 
-var _ circle.UserService = &Client{}
+var _ circle.Client = &Client{}
 
 // Shared transports for all clients to prevent leaking connections
 var skipVerifyTransport *http.Transport

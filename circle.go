@@ -116,6 +116,12 @@ type Response interface {
 
 type Service interface {
 	Get(ctx context.Context, source Source) (Tasks, string, error)
+	List(ctx context.Context, source Source) (WechatShares, string, error)
 	UnfinishedWechatShares(tasks Tasks) (WechatShares, error)
 	Do(ctx context.Context, wc WechatShare, token string) error
+}
+
+type Assignment interface {
+	Pub(source Source) error
+	Close() error
 }

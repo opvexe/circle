@@ -24,54 +24,65 @@ import (
 )
 
 type assignment struct {
-	svc    circle.Service
-	sched  schedule.Scheduler
-	ctx    context.Context
-	source circle.Source
+	svc  circle.Service
+	wc   chan WC
+	stop chan struct{}
 }
 
-func NewAssignment(source circle.Source, ctx context.Context) *assignment {
+func NewAssignment() circle.Assignment {
 	s := &assignment{
-		svc:    NewService(),
-		sched:  schedule.NewFIFOScheduler(),
-		source: source,
-		ctx:    ctx,
+		svc:  NewService(),
+		wc:   make(chan WC, 100),
+		stop: make(chan struct{}),
 	}
-	go s.run()
+	go s.schedule()
 	return s
 }
 
-func (s *assignment) run() error {
-	defer s.sched.Stop()
-	tasks, token, err := s.svc.Get(s.ctx, s.source)
-	if err != nil {
-		return err
-	}
-
-	shares, err := s.svc.UnfinishedWechatShares(tasks)
-	if err != nil {
-		return err
-	}
-
-	jb := func(ws circle.WechatShare) schedule.Job {
-		return func(ctx context.Context) {
-			if err := s.svc.Do(ctx, ws, token); err != nil {
-				log.Printf("sched do task err: %s", err)
+func (s *assignment) schedule() {
+	sched := schedule.NewFIFOScheduler()
+	for {
+		select {
+		case list := <-s.wc:
+			for _, l := range list.wc {
+				sched.Schedule(func(ctx context.Context) {
+					if err := s.svc.Do(ctx, l, list.token); err != nil {
+						log.Printf("sched do task err: %s", err)
+					}
+				})
 			}
+			sched.WaitFinish(len(list.wc))
+			return
+		case <-s.stop:
+			if sched != nil {
+				sched.Stop()
+			}
+			return
 		}
 	}
+}
 
-	for _, share := range shares {
-		s.sched.Schedule(jb(share))
+type WC struct {
+	wc    circle.WechatShares
+	token string
+}
+
+func (s *assignment) Pub(source circle.Source) error {
+	list, token, err := s.svc.List(context.Background(), source)
+	if err != nil {
+		return err
 	}
 
-	s.sched.WaitFinish(len(shares))
+	select {
+	case s.wc <- WC{wc: list, token: token}:
+	default:
+	}
 	return nil
 }
 
 func (s *assignment) Close() error {
-	if s.sched != nil {
-		s.sched.Stop()
+	if s.stop != nil {
+		close(s.stop)
 	}
 	return nil
 }

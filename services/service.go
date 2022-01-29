@@ -163,6 +163,19 @@ func (s *service) UnfinishedWechatShares(tasks circle.Tasks) (circle.WechatShare
 	return shares, nil
 }
 
+func (s *service) List(ctx context.Context, source circle.Source) (circle.WechatShares, string, error) {
+	tasks, token, err := s.Get(context.Background(), source)
+	if err != nil {
+		return nil, "", err
+	}
+
+	shares, err := s.UnfinishedWechatShares(tasks)
+	if err != nil {
+		return nil, "", err
+	}
+	return shares, token, nil
+}
+
 func (s *service) Do(ctx context.Context, wc circle.WechatShare, token string) error {
 	url := fmt.Sprintf("%s%s", URL, wechat)
 	client, err := s.connect.Connect(ctx, circle.Source{URL: url, Token: token})
