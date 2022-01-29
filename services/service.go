@@ -34,33 +34,34 @@ const (
 	wechat = "mytask/forwardlogww" // 1:朋友圈 2:微信群
 )
 
-type Service struct {
+type service struct {
 	connect *Connect
 	client  circle.Client
 	wg      errgroup.Group
 }
 
-func NewService() (*Service, error) {
-	return &Service{
+func NewService() circle.Service {
+	return &service{
 		connect: NewConnectService(),
 		client:  &queries.Client{},
-	}, nil
+		wg:      errgroup.Group{},
+	}
 }
 
-func (s *Service) Get(ctx context.Context, source circle.Source) (circle.Tasks, error) {
+func (s *service) Get(ctx context.Context, source circle.Source) (circle.Tasks, string, error) {
 	userInfo, err := s.login(ctx, source)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	tasks, err := s.fetch(ctx, userInfo.Token)
 	if err != nil {
-		return nil, err
+		return nil, userInfo.Token, err
 	}
-	return tasks, nil
+	return tasks, userInfo.Token, nil
 }
 
-func (s *Service) login(ctx context.Context, source circle.Source) (*circle.UserInfo, error) {
+func (s *service) login(ctx context.Context, source circle.Source) (*circle.UserInfo, error) {
 	source.URL = fmt.Sprintf("%s%s", URL, login)
 	client, err := s.connect.Connect(ctx, source)
 	if err != nil {
@@ -73,7 +74,7 @@ func (s *Service) login(ctx context.Context, source circle.Source) (*circle.User
 	return userInfo, nil
 }
 
-func (s *Service) fetch(ctx context.Context, token string) (circle.Tasks, error) {
+func (s *service) fetch(ctx context.Context, token string) (circle.Tasks, error) {
 	url := fmt.Sprintf("%s%s", URL, tasks)
 	client, err := s.connect.Connect(ctx, circle.Source{URL: url, Token: token})
 	if err != nil {
@@ -108,7 +109,7 @@ func (s *Service) fetch(ctx context.Context, token string) (circle.Tasks, error)
 	return s.unfinished(tasks), nil
 }
 
-func (s *Service) unfinished(tasks circle.Tasks) (unfinished circle.Tasks) {
+func (s *service) unfinished(tasks circle.Tasks) (unfinished circle.Tasks) {
 	if len(tasks) == 0 {
 		return unfinished
 	}
@@ -130,7 +131,7 @@ func (s *Service) unfinished(tasks circle.Tasks) (unfinished circle.Tasks) {
 	return unfinished
 }
 
-func (s *Service) UnfinishedWechatShares(tasks circle.Tasks) (circle.WechatShares, error) {
+func (s *service) UnfinishedWechatShares(tasks circle.Tasks) (circle.WechatShares, error) {
 	shares := make(circle.WechatShares, len(tasks))
 	for _, task := range tasks {
 		if task.UserCircleCount < task.CircleCountRw { // 朋友圈
@@ -162,7 +163,7 @@ func (s *Service) UnfinishedWechatShares(tasks circle.Tasks) (circle.WechatShare
 	return shares, nil
 }
 
-func (s *Service) Do(ctx context.Context, wc circle.WechatShare, token string) error {
+func (s *service) Do(ctx context.Context, wc circle.WechatShare, token string) error {
 	url := fmt.Sprintf("%s%s", URL, wechat)
 	client, err := s.connect.Connect(ctx, circle.Source{URL: url, Token: token})
 	if err != nil {

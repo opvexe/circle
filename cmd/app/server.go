@@ -20,6 +20,7 @@ import (
 	"context"
 	"github.com/spf13/cobra"
 	"x6t.io/circle"
+	"x6t.io/circle/services"
 )
 
 func NewCircleCommand() *cobra.Command {
@@ -48,6 +49,7 @@ func NewCircleCommand() *cobra.Command {
 }
 
 func Run(opt *RunServerConfig, ctx context.Context) error {
+	s := services.NewAssignment(opt.PreRun(), ctx)
 
 	return nil
 }
