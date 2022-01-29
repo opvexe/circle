@@ -44,14 +44,16 @@ func (s *assignment) schedule() {
 	for {
 		select {
 		case list := <-s.wc:
-			for _, l := range list.wc {
+			fn := func(list WC) {
+				defer sched.Stop()
 				sched.Schedule(func(ctx context.Context) {
 					if err := s.svc.Do(ctx, l, list.token); err != nil {
 						log.Printf("sched do task err: %s", err)
 					}
 				})
+				sched.WaitFinish(len(list.wc))
 			}
-			sched.WaitFinish(len(list.wc))
+			fn(list)
 			return
 		case <-s.stop:
 			if sched != nil {
