@@ -21,7 +21,12 @@ COPY version.go version.go
 RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH go build -a -o circled ./cmd/main.go
 
 FROM --platform=$BUILDPLATFORM alpine:latest
-ENV TZ=Asia/Shanghai LANG="C.UTF-8"
+# Set China time zone copy from https://cloud.tencent.com/developer/article/1626811
+ENV TZ Asia/Shanghai
+RUN apk add tzdata && cp /usr/share/zoneinfo/${TZ} /etc/localtime \
+    && echo ${TZ} > /etc/timezone \
+    && apk del tzdata \
+
 WORKDIR /
 COPY --from=builder /workspace/circled .
 ENTRYPOINT ["/circled"]
