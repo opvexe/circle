@@ -18,11 +18,13 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"github.com/robfig/cron/v3"
 	"github.com/spf13/cobra"
 	"log"
 	"x6t.io/circle"
 	"x6t.io/circle/services"
+	"x6t.io/circle/term"
 )
 
 func NewCircleCommand() *cobra.Command {
@@ -40,6 +42,19 @@ provide a list of timed collection tasks, handle WeChat sharing and Moments shar
 		},
 		SilenceUsage: true,
 	}
+
+	fs := cmd.Flags()
+	namedFlagSets := s.Flags()
+	for _, f := range namedFlagSets.FlagSets {
+		fs.AddFlagSet(f)
+	}
+
+	usageFmt := "Usage:\n  %s\n"
+	cols, _, _ := term.TerminalSize(cmd.OutOrStdout())
+	cmd.SetHelpFunc(func(cmd *cobra.Command, args []string) {
+		fmt.Fprintf(cmd.OutOrStdout(), "%s\n\n"+usageFmt, cmd.Long, cmd.UseLine())
+		services.PrintSections(cmd.OutOrStdout(), namedFlagSets, cols)
+	})
 
 	versionCmd := &cobra.Command{
 		Use:   "version",
