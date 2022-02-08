@@ -29,12 +29,12 @@ func NewCircleCommand() *cobra.Command {
 	s := NewRunServerConfig()
 
 	cmd := &cobra.Command{
-		Use:  "circle",
+		Use: "circle",
 		Long: `The Micro Circle server Service verification and configuration service objects.
 provide a list of timed collection tasks, handle WeChat sharing and Moments sharing tasks.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			if err  :=s.Validate();err !=nil{
-				return err
+			if err := s.Validate(); len(err) != 0 {
+				return circle.NewAggregate(err)
 			}
 			return Run(s, circle.SetupSignalHandler())
 		},
@@ -57,18 +57,18 @@ func Run(opt *RunServerConfig, ctx context.Context) error {
 	c := cron.New()
 	defer c.Stop()
 
-	_,err:= c.AddFunc(opt.Express, func() {
-		if err :=services.NewAssignment().Pub(opt.PreRun());err !=nil{
+	_, err := c.AddFunc(opt.Express, func() {
+		if err := services.NewAssignment().Pub(opt.PreRun()); err != nil {
 			log.Printf("corn task assignment tasks")
 		}
 	})
 
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	c.Start()
 
-	<- ctx.Done()
+	<-ctx.Done()
 	log.Printf("Circle server exiting")
 	return nil
 }

@@ -17,37 +17,27 @@ limitations under the License.
 package app
 
 import (
-	"fmt"
 	"x6t.io/circle"
+	"x6t.io/circle/services"
 )
 
 type RunServerConfig struct {
-	Account         string `envconfig:"optional"`
-	Password        string `envconfig:"optional"`
-	Tuisongclientid string `envconfig:"optional"`
-	Express         string `envconfig:"optional"`
+	*services.Options
+
+	DebugMode bool
 }
 
 func NewRunServerConfig() *RunServerConfig {
 	return &RunServerConfig{
-		Account:         "chenxue",
-		Password:        "ZHENdong123",
-		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
-		Express:         "@daily",
+		Options: services.NewOptions(),
 	}
 }
 
-func (c *RunServerConfig) Validate() error {
-	if len(c.Account) == 0 {
-		return fmt.Errorf("account must be not empty")
-	}
-	if len(c.Password) == 0 {
-		return fmt.Errorf("password must be not empty")
-	}
-	if len(c.Tuisongclientid) == 0 {
-		return fmt.Errorf("clientid must be not empty")
-	}
-	return nil
+func (s *RunServerConfig) Flags() (fss services.NamedFlagSets) {
+	fs := fss.FlagSet("circle")
+	fs.BoolVar(&s.DebugMode, "debug", false, "Don't enable this if you don't know what it means.")
+	s.Options.AddFlags(fss.FlagSet("assignment"), s.Options)
+	return fss
 }
 
 func (c *RunServerConfig) PreRun() circle.Source {
