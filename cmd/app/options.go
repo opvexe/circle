@@ -33,7 +33,7 @@ func NewRunServerConfig() *RunServerConfig {
 		Account:         "chenxue",
 		Password:        "ZHENdong123",
 		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
-		Express:         "0 0 7 * * *",
+		Express:         "@daily",
 	}
 }
 

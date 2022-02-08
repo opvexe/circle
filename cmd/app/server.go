@@ -18,8 +18,11 @@ package app
 
 import (
 	"context"
+	"github.com/robfig/cron/v3"
 	"github.com/spf13/cobra"
+	"log"
 	"x6t.io/circle"
+	"x6t.io/circle/services"
 )
 
 func NewCircleCommand() *cobra.Command {
@@ -27,12 +30,15 @@ func NewCircleCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:  "circle",
-		Long: "",
+		Long: `The Micro Circle server Service verification and configuration service objects.
+provide a list of timed collection tasks, handle WeChat sharing and Moments sharing tasks.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
+			if err  :=s.Validate();err !=nil{
+				return err
+			}
 			return Run(s, circle.SetupSignalHandler())
 		},
-		SilenceUsage: false,
+		SilenceUsage: true,
 	}
 
 	versionCmd := &cobra.Command{
@@ -42,12 +48,27 @@ func NewCircleCommand() *cobra.Command {
 			cmd.Println(circle.Get())
 		},
 	}
-
 	cmd.AddCommand(versionCmd)
 	return cmd
 }
 
 func Run(opt *RunServerConfig, ctx context.Context) error {
+	log.Printf("Circle server turning on")
+	c := cron.New()
+	defer c.Stop()
 
+	_,err:= c.AddFunc(opt.Express, func() {
+		if err :=services.NewAssignment().Pub(opt.PreRun());err !=nil{
+			log.Printf("corn task assignment tasks")
+		}
+	})
+
+	if err!=nil{
+		return err
+	}
+	c.Start()
+
+	<- ctx.Done()
+	log.Printf("Circle server exiting")
 	return nil
 }
