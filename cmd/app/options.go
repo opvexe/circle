@@ -34,9 +34,9 @@ func NewRunServerConfig() *RunServerConfig {
 }
 
 func (s *RunServerConfig) Flags() (fss services.NamedFlagSets) {
-	fs := fss.FlagSet("circle")
+	fs := fss.FlagSet("generic")
 	fs.BoolVar(&s.DebugMode, "debug", false, "Don't enable this if you don't know what it means.")
-	s.Options.AddFlags(fss.FlagSet("assignment"), s.Options)
+	s.Options.AddFlags(fss.FlagSet("server"), s.Options)
 	return fss
 }
 
