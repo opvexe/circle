@@ -49,7 +49,7 @@ func (c *Options) Validate() []error {
 	if len(c.Tuisongclientid) == 0 {
 		errors = append(errors, fmt.Errorf("clientid must be not empty"))
 	}
-	if len(c.Express) != 0 {
+	if len(c.Express) == 0 {
 		errors = append(errors, fmt.Errorf("express must be not empty"))
 	}
 	return errors

@@ -40,7 +40,7 @@ provide a list of timed collection tasks, handle WeChat sharing and Moments shar
 			}
 			return Run(s, circle.SetupSignalHandler())
 		},
-		SilenceUsage: true,
+		SilenceUsage: false,
 	}
 
 	fs := cmd.Flags()
