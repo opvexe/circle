@@ -29,9 +29,9 @@ import (
 const (
 	URL    = "https://informationworld.zdjt.com/index.php/api/"
 	login  = "user/login"
-	tasks  = "mytask/wwtask"       // 任务列表
-	detail = "mytask/microdetail"  // 任务详情
-	wechat = "mytask/forwardlogww" // 1:朋友圈 2:微信群
+	tasks  = "mytask/wwtask"       // task list url
+	detail = "mytask/microdetail"  // Mission Details url
+	wechat = "mytask/forwardlogww" // 1: Moments 2: WeChat group
 )
 
 type service struct {

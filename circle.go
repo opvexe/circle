@@ -57,24 +57,24 @@ type UserInfo struct {
 type Tasks []Task
 
 type Task struct {
-	ID      int    `json:"id,omitempty"`       // 文章id
-	Title   string `json:"title,omitempty"`    // 标题
-	EndTime int    `json:"end_time,omitempty"` // 结束时间
+	ID      int    `json:"id,omitempty"`
+	Title   string `json:"title,omitempty"`
+	EndTime int    `json:"end_time,omitempty"`
 	// The current number of tasks and the specified number of completed tasks.
 	// containing user is the statistics of the number of tasks completed by the user prefix.
-	ReadCount       int `json:"read_count,omitempty"`        // 任务阅读数
-	UserReadCount   int `json:"user_read_count,omitempty"`   // 用户阅读数
-	FinishScore     int `json:"finish_score,omitempty"`      // 任务积分
-	UserScore       int `json:"user_score,omitempty"`        // 用户当前积分
-	GroupCountRw    int `json:"group_count_rw,omitempty"`    // 任务微信群数
-	UserGroupCount  int `json:"user_group_count,omitempty"`  // 用户微信群数
-	CircleCountRw   int `json:"circle_count_rw,omitempty"`   // 任务朋友圈
-	UserCircleCount int `json:"user_circle_count,omitempty"` // 用户朋友圈
+	ReadCount       int `json:"read_count,omitempty"`        // task readings
+	UserReadCount   int `json:"user_read_count,omitempty"`   // User readings
+	FinishScore     int `json:"finish_score,omitempty"`      // task credits
+	UserScore       int `json:"user_score,omitempty"`        // User's current points
+	GroupCountRw    int `json:"group_count_rw,omitempty"`    // The number of task WeChat groups
+	UserGroupCount  int `json:"user_group_count,omitempty"`  // User WeChat groups
+	CircleCountRw   int `json:"circle_count_rw,omitempty"`   // mission circle of friends
+	UserCircleCount int `json:"user_circle_count,omitempty"` // User Moments
 	// Statistics on the number of user sharing tasks.
 	// after adding the number of WeChat groups to the number of Moments.
-	UserTaskCount int `json:"user_task_count,omitempty"` // 用户微信群+朋友圈分享次数
+	UserTaskCount int `json:"user_task_count,omitempty"` // User WeChat group + Moments sharing times
 	// WeChat share pictures and connections.
-	MicroURL string `json:"micro_url,omitempty"` // 微信分享链接
+	MicroURL string `json:"micro_url,omitempty"` // WeChat share link
 }
 
 // Fitter is processing parameters.
@@ -94,8 +94,8 @@ type WechatShare struct {
 type WechatType string
 
 const (
-	Friends = "1" // 朋友圈
-	Group   = "2" // 微信群
+	Friends = "1" // WeChat Moments
+	Group   = "2" // WeChat group
 )
 
 // Client is an interface for login.

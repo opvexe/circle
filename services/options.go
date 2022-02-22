@@ -30,9 +30,9 @@ type Options struct {
 
 func NewOptions() *Options {
 	return &Options{
-		Account:         "chenxue",
-		Password:        "ZHENdong123",
-		Tuisongclientid: "e0d0171b89075356632758ca7df6a3ac",
+		Account:         "zhangming",
+		Password:        "zhangming",
+		Tuisongclientid: "e0d0171b8887997758ca7df6a3ac",
 		Express:         "@daily",
 	}
 }
